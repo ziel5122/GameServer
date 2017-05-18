@@ -16,17 +16,19 @@
 #if PLATFORM == PLATFORM_WINDOWS
   #include <winsock2.h>
 
+  typedef int socklen_t;
+
   WSADATA wsa_data;
 #elif PLATFORM == PLATFORM_UNIX || PLATFORM == PLATFORM_MAC
+  #include <arpa/inet.h>
   #include <netinet/in.h>
 #endif
 
 struct sockaddr_in server;
 
 int error;
-int sock;
 
-int BindSocket(uint port) {
+int BindSocket(int sock, uint port) {
   server.sin_family = AF_INET;
   server.sin_addr.s_addr = INADDR_ANY;
   server.sin_port = htons(port);
@@ -34,15 +36,6 @@ int BindSocket(uint port) {
   error = bind(sock, (struct sockaddr*)&server, sizeof(server));
   if (error == -1) {
     printf("Bind failed with error: %d\n", error);
-    return 1;
-  }
-  return 0;
-}
-
-int CreateSocket() {
-  sock = socket(AF_INET, SOCK_DGRAM, 0);
-  if (sock == -1) {
-    printf("Could not create socket: %d\n", sock);
     return 1;
   }
   return 0;
@@ -59,12 +52,12 @@ int InitializeSockets() {
   return 0;
 }
 
-ReceiveBytes() {
+void ReceiveBytes() {
 
 }
 
-SendBytes() {
-  
+void SendBytes() {
+
 }
 
 #endif
