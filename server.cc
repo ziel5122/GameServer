@@ -11,6 +11,13 @@ struct Player {
   float z;
 };
 
+struct Potato {
+  float x;
+  float y;
+  float z;
+  bool owner;
+};
+
 struct GameState {
   struct Player players[6] = {
     { 1.0f, 2.0f, 3.0f },
