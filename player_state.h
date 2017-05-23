@@ -9,29 +9,47 @@ struct Position {
   float z;
 };
 
+struct DataPacket {
+  Position position;
+  Position potato_position;
+};
+
 struct PlayerState {
   std::mutex position_lock;
 
   Position* position;
+  Position* potato_position;
 
-  void get_position(Position* &player_position) {
-    position_lock.lock();
-    player_position = position;
-    printf("getting position\n");
-    position_lock.unlock();
+  unsigned char index;
+
+  DataPacket* GetDataPacket() {
+    DataPacket* data_packet = new DataPacket();
+    data_packet->position = *position;
+    data_packet->potato_position = *potato_position;
+    return data_packet;
   }
 
-  void print_position() {
+  unsigned char GetIndex() {
+    return index;
+  }
+
+  void PrintPosition() {
     printf("Position:\n");
     printf("\tx: %f\n", position->x);
     printf("\ty: %f\n", position->y);
     printf("\tz: %f\n", position->z);
   }
 
-  void set_position(Position* player_position) {
+  Position* pGetPosition() {
+    position_lock.lock();
+    Position* player_position = position;
+    position_lock.unlock();
+    return player_position;
+  }
+
+  void pSetPosition(Position* player_position) {
     position_lock.lock();
     position = player_position;
-    printf("setting position\n");
     position_lock.unlock();
   }
 };
