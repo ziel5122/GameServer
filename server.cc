@@ -53,11 +53,10 @@ int main() {
 
   player_state_from = new PlayerState();
 
-  DataPacket* data_packet = new DataPacket();
-  data_packet = player_state_to->GetDataPacket();
+  DataPacket* data_packet = player_state_to->GetDataPacket();
   int data_packet_size = sizeof(*data_packet);
   bytes_sent = sendto(sock, (void*)data_packet, data_packet_size, 0,
-   (sockaddr*)&to, from_length);
+                      (sockaddr*)&to, from_length);
   if (bytes_sent <= 0) {
     printf("send failed\n");
     return 1;
@@ -65,25 +64,40 @@ int main() {
 
   DataPacket* data_packet_from;
   char* temp = new char;
-  bytes_read = recvfrom(sock2, temp,
-   data_packet_size, 0, (sockaddr*)&from, &from_length);
+  bytes_read = recvfrom(sock2, temp, data_packet_size, 0, (sockaddr*)&from,
+                        &from_length);
   if (bytes_read <= 0) {
     printf("read failed\n");
     return 1;
   }
+
   printf("%d\t%d\n", bytes_sent, bytes_read);
 
-  game_state.player1 = player_state_from;
-  player_state_from = new PlayerState();
-  printf("%f\n", game_state.player1->position->x);
-  player_state_to->position->x = 69.0;
-  printf("%f\n", game_state.player1->position->x);
-  /*
-  bytes_sent = sendto(sock, (void*)player_state_to, sizeof(*player_state_to),
-   0, (sockaddr*)&to, from_length);
-  bytes_read = recvfrom(sock2, (struct PlayerState*)player_state_from,
-   sizeof(*player_state_from), 0, (sockaddr*)&from, &from_length);
-  printf("%f\n", game_state.player1->position->x);
-  */
+  data_packet_from = (struct DataPacket*)temp;
+  Position position = data_packet_from->position;
+  printf("%f\n", position.x);
+
+
+  player_state_to->position->x = 16.0f;
+  data_packet = player_state_to->GetDataPacket();
+  bytes_sent = sendto(sock, (void*)data_packet, data_packet_size, 0,
+                      (sockaddr*)&to, from_length);
+  if (bytes_sent <= 0) {
+    printf("send failed\n");
+    return 1;
+  }
+
+  temp = new char;
+  bytes_read = recvfrom(sock2, temp, data_packet_size, 0, (sockaddr*)&from,
+                        &from_length);
+  if (bytes_read <= 0) {
+    printf("read failed\n");
+    return 1;
+  }
+
+  data_packet_from = (struct DataPacket*)temp;
+  Position* pos = &data_packet_from->position;
+  printf("%f\n", pos->x);
+
   return 0;
 }
